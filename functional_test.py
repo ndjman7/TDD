@@ -35,11 +35,12 @@ class NewVisitorTest(unittest.TestCase):
         # 엔터키를 치면 페이지가 갱신되고 작업 목록에
         # "1: 공작깃털 사기" 아이템이 추가된다.
         inputbox.send_keys(Keys.ENTER)
-        
+
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertTrue(
             any(row.text == '1: 공작깃털 사기' for row in rows),
+            "신규 작업이 테이블에 표시되지 않는다."
         )
 
         self.fail('Finish the Test!')
