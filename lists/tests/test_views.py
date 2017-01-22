@@ -5,25 +5,27 @@ from django.http import HttpRequest
 from django.utils.html import escape
 import re
 from lists.views import home_page
+from lists.forms import ItemForm
 from lists.models import Item, List
 
 
 class HomePageTest(TestCase):
 
+    maxDiff = None
+
     def remove_csrf(self, origin):
         csrf_regex = r'<input[^>]+csrfmiddlewaretoken[^>]+>'
         return re.sub(csrf_regex, '', origin)
 
-    def test_root_url_resolves_to_home_page_view(self):
-        found = resolve('/')
-        self.assertEqual(found.func, home_page)
 
-    def test_home_page_returns_correct_html(self):
-        request = HttpRequest()
-        response = home_page(request)
-        expected_html = self.remove_csrf(render_to_string('home.html', request=request))
-        response_decode = self.remove_csrf(response.content.decode())
-        self.assertEqual(response_decode, expected_html)
+    def test_home_page_renders_home_template(self):
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'home.html')
+
+
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm)
 
 
 class ListViewTest(TestCase):
@@ -32,7 +34,7 @@ class ListViewTest(TestCase):
         list_ = List.objects.create()
         response = self.client.get('/lists/%d/' % (list_.id,))
         self.assertTemplateUsed(response, 'list.html')
-        
+
     def test_displays_only_items_for_taht_list(self):
         correct_list = List.objects.create()
         Item.objects.create(text='itemey 1', list=correct_list)
