@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from lists.models import Item, List
 
 
-class ListAndModelsTest(TestCase):
+class ListAndItemModelsTest(TestCase):
 
     def test_item_is_related_to_list(self):
         list_ = List.objects.create()
@@ -24,7 +24,7 @@ class ListAndModelsTest(TestCase):
         Item.objects.create(list=list_, text='bla')
         with self.assertRaises(ValidationError):
             item = Item(list=list_, text='bla')
-            #item.full_clean()
+            item.full_clean()
             item.save()
 
     def test_CAN_save_same_item_to_different_lists(self):
@@ -32,7 +32,7 @@ class ListAndModelsTest(TestCase):
         list2 = List.objects.create()
         Item.objects.create(list=list1, text='bla')
         item = Item(list=list2, text='bla')
-        item.full_clean()
+        item.full_clean() # 에러를 발생시키지 않는다.
 
     def test_list_ordering(self):
         list1 = List.objects.create()
